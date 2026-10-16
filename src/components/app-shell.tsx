@@ -19,7 +19,6 @@ import {
   ShieldCheck,
   Target,
   Upload,
-  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -86,14 +85,13 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
   const [forcePwd, setForcePwd] = useState(false);
   const [tourOpen, setTourOpen] = useState(false);
   const [sendReportOpen, setSendReportOpen] = useState(false);
-  // The server now tracks "must change password" itself (no more per-browser flag).
+
   useEffect(() => {
     setForcePwd(Boolean(user?.mustChangePassword));
   }, [user?.mustChangePassword]);
 
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
-  // "I'm online" ping + a fresh team directory (avatars / online dots) once a minute.
   const username = user?.username;
   const mustChange = Boolean(user?.mustChangePassword);
   useEffect(() => {
@@ -109,6 +107,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
       document.removeEventListener("visibilitychange", ping);
     };
   }, [username, mustChange]);
+
   useQuery({
     queryKey: ["local-users"],
     queryFn: () => listLocalUsers(),
@@ -201,14 +200,12 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
     <div
       className={cn(
         "k-wallpaper flex flex-col text-fg",
-        // The chat page is a "fixed-height app" (people list and conversation scroll separately);
-        // every other page keeps the normal page scroll.
         fixedHeight ? "h-dvh overflow-hidden" : "min-h-dvh",
       )}
     >
       <header className="k-glass sticky top-0 z-30 border-b border-border">
         <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-          <Link to="/" className="flex items-center gap-2 pe-2">
+          <Link to="/" className="flex items-center gap-2 pe-2" title={APP_NAME}>
             <LogoMark className="size-7" />
             <span className="hidden text-[15px] font-semibold sm:inline">{APP_NAME}</span>
           </Link>
@@ -219,7 +216,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
               window.setTimeout(() => setTourOpen(true), 30);
             }}
           />
-            <BoardSwitcher
+          <BoardSwitcher
             boards={boards}
             boardId={boardId}
             onCreate={can("create_board") ? onCreateBoard : undefined}
@@ -240,28 +237,8 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
           </div>
 
           <div className="ms-auto flex items-center gap-1">
-            <Link
-              to="/messages"
-              className="relative grid size-8 place-items-center rounded-md text-muted hover:bg-accent-soft hover:text-fg"
-              aria-label="پیام‌ها"
-            >
-              <MessageSquare className="size-4" />
-              {unread > 0 && (
-                <span className="absolute -top-0.5 -start-0.5 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-danger-fg">
-                  {unread > 9 ? "۹+" : unread}
-                </span>
-              )}
-            </Link>
-            <Link
-              to="/people"
-              className="inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg"
-              aria-label="افراد"
-              title="افراد"
-            >
-              <Users className="size-4" />
-            </Link>
             <NotificationsBell />
-            <Button variant="ghost" size="icon-sm" aria-label="ظاهر برنامه" onClick={() => setAppearanceOpen(true)}>
+            <Button variant="ghost" size="icon-sm" aria-label="ظاهر برنامه" title="شخصی‌سازی ظاهر" onClick={() => setAppearanceOpen(true)}>
               <Palette />
             </Button>
 
@@ -318,6 +295,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
               <Link
                 key={item.label}
                 to={item.to}
+                title={item.label}
                 className={cn(
                   "relative flex w-16 flex-col items-center gap-1 rounded-lg px-1 py-2 text-[11px] transition-colors duration-150",
                   active ? "bg-accent-soft text-fg" : "text-muted hover:bg-accent-soft hover:text-fg",
@@ -349,6 +327,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
               <Link
                 key={item.label}
                 to={item.to}
+                title={item.label}
                 className={cn(
                   "relative flex min-h-14 min-w-[4.5rem] flex-1 flex-col items-center justify-center gap-0.5 text-[11px]",
                   active ? "text-accent" : "text-muted",
@@ -428,7 +407,7 @@ function BoardSwitcher({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" size="sm" className="max-w-[46vw] truncate sm:max-w-xs">
+        <Button variant="secondary" size="sm" className="max-w-[46vw] truncate sm:max-w-xs" title="انتخاب تخته">
           <LayoutGrid className="size-3.5" />
           <span className="truncate">{current?.title ?? "تخته‌ها"}</span>
         </Button>
@@ -525,6 +504,7 @@ function AccountChip({
           type="button"
           className="flex items-center gap-2 rounded-full p-0.5 pe-2 hover:bg-accent-soft"
           aria-label="حساب کاربری"
+          title="منوی حساب کاربری"
         >
           <UserAvatar username={username} name={name} size="sm" />
           <span className="hidden max-w-28 truncate text-[13px] sm:inline">{name}</span>
