@@ -19,7 +19,7 @@ import {
   ShieldCheck,
   Target,
   Upload,
-  Users,
+  Languages,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -87,6 +87,29 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
   const [tourOpen, setTourOpen] = useState(false);
   const [sendReportOpen, setSendReportOpen] = useState(false);
 
+  // Language state
+  const [lang, setLang] = useState<"fa" | "en">("fa");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sibamotor-lang") as "fa" | "en";
+      if (saved === "en" || saved === "fa") setLang(saved);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  function toggleLanguage() {
+    const next = lang === "fa" ? "en" : "fa";
+    setLang(next);
+    try {
+      localStorage.setItem("sibamotor-lang", next);
+    } catch {
+      // ignore
+    }
+    window.location.reload();
+  }
+
   useEffect(() => {
     setForcePwd(Boolean(user?.mustChangePassword));
   }, [user?.mustChangePassword]);
@@ -134,6 +157,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
 
   const nav = useMemo(() => {
     const bid = boardId ?? boards[0]?.id;
+    const isEn = lang === "en";
     const items: {
       to: string;
       icon: typeof LayoutGrid;
@@ -141,17 +165,17 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
       match: (p: string) => boolean;
       badge?: number;
     }[] = [
-      { to: bid ? `/b/${bid}` : "/", icon: LayoutGrid, label: "تخته", match: (p: string) => p.startsWith("/b/") && !p.includes("/gantt") && !p.includes("/calendar") && !p.includes("/scrum") && !p.includes("/report") },
-      { to: bid ? `/b/${bid}/gantt` : "/", icon: GanttChart, label: "گانت", match: (p: string) => p.includes("/gantt") },
-      { to: bid ? `/b/${bid}/calendar` : "/", icon: CalendarDays, label: "تقویم", match: (p: string) => p.includes("/calendar") },
-      { to: bid ? `/b/${bid}/scrum` : "/", icon: Target, label: "اسکرام", match: (p: string) => p.includes("/scrum") },
-      { to: bid ? `/b/${bid}/report` : "/", icon: BarChart3, label: "داشبورد", match: (p: string) => p.includes("/report") && !p.includes("reports-inbox") },
-      { to: "/reports-inbox", icon: FileText, label: "گزارش", match: (p: string) => p.startsWith("/reports-inbox") },
-      { to: "/my", icon: ListTodo, label: "کارهای من", match: (p: string) => p.startsWith("/my") },
-      { to: "/messages", icon: MessageSquare, label: "پیام‌ها", match: (p: string) => p.startsWith("/messages"), badge: unread },
+      { to: bid ? `/b/${bid}` : "/", icon: LayoutGrid, label: isEn ? "Board" : "تخته", match: (p: string) => p.startsWith("/b/") && !p.includes("/gantt") && !p.includes("/calendar") && !p.includes("/scrum") && !p.includes("/report") },
+      { to: bid ? `/b/${bid}/gantt` : "/", icon: GanttChart, label: isEn ? "Gantt" : "گانت", match: (p: string) => p.includes("/gantt") },
+      { to: bid ? `/b/${bid}/calendar` : "/", icon: CalendarDays, label: isEn ? "Calendar" : "تقویم", match: (p: string) => p.includes("/calendar") },
+      { to: bid ? `/b/${bid}/scrum` : "/", icon: Target, label: isEn ? "Scrum" : "اسکرام", match: (p: string) => p.includes("/scrum") },
+      { to: bid ? `/b/${bid}/report` : "/", icon: BarChart3, label: isEn ? "Dashboard" : "داشبورد", match: (p: string) => p.includes("/report") && !p.includes("reports-inbox") },
+      { to: "/reports-inbox", icon: FileText, label: isEn ? "Reports" : "گزارش", match: (p: string) => p.startsWith("/reports-inbox") },
+      { to: "/my", icon: ListTodo, label: isEn ? "My Tasks" : "کارهای من", match: (p: string) => p.startsWith("/my") },
+      { to: "/messages", icon: MessageSquare, label: isEn ? "Messages" : "پیام‌ها", match: (p: string) => p.startsWith("/messages"), badge: unread },
     ];
     return items;
-  }, [boardId, boards, unread]);
+  }, [boardId, boards, unread, lang]);
 
   async function handleExport() {
     try {
@@ -165,9 +189,9 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success("فایل پشتیبان ذخیره شد.");
+      toast.success(lang === "en" ? "Backup saved successfully." : "فایل پشتیبان ذخیره شد.");
     } catch {
-      toast.error("خطا در ساخت فایل پشتیبان.");
+      toast.error(lang === "en" ? "Error creating backup." : "خطا در ساخت فایل پشتیبان.");
     }
   }
 
@@ -186,10 +210,10 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
         toast.error(res.error);
         return;
       }
-      toast.success("بازیابی انجام شد. صفحه بارگذاری می‌شود…");
+      toast.success(lang === "en" ? "Restored successfully. Reloading..." : "بازیابی انجام شد. صفحه بارگذاری می‌شود…");
       window.setTimeout(() => window.location.reload(), 800);
     };
-    reader.onerror = () => toast.error("خطا در خواندن فایل.");
+    reader.onerror = () => toast.error(lang === "en" ? "Error reading file." : "خطا در خواندن فایل.");
     reader.readAsText(file);
   }
 
@@ -217,6 +241,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
             boards={boards}
             boardId={boardId}
             onCreate={can("create_board") ? onCreateBoard : undefined}
+            lang={lang}
           />
 
           <div className="mx-auto hidden max-w-sm flex-1 md:block">
@@ -226,7 +251,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
                 <Input
                   value={search ?? ""}
                   onChange={(e) => onSearch(e.target.value)}
-                  placeholder="جستجوی کارت…"
+                  placeholder={lang === "en" ? "Search cards..." : "جستجوی کارت…"}
                   className="h-9 bg-surface-2 pe-9 placeholder:text-subtle"
                 />
               </div>
@@ -234,40 +259,20 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
           </div>
 
           <div className="ms-auto flex items-center gap-1">
-            <Link
-              to="/people"
-              className={cn(
-                "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
-                pathname.startsWith("/people") && "bg-accent-soft text-fg"
-              )}
-              title="افراد"
+            {/* Language Switch Button */}
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={toggleLanguage}
+              title={lang === "fa" ? "Change to English" : "تغییر به فارسی"}
+              className="font-semibold text-xs px-2"
             >
-              <Users className="size-4" />
-            </Link>
-            <Link
-              to="/activity"
-              className={cn(
-                "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
-                pathname.startsWith("/activity") && "bg-accent-soft text-fg"
-              )}
-              title="لاگ رویدادها"
-            >
-              <History className="size-4" />
-            </Link>
-            {isAdmin && (
-              <Link
-                to="/admin"
-                className={cn(
-                  "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
-                  pathname.startsWith("/admin") && "bg-accent-soft text-fg"
-                )}
-                title="مدیریت کاربران"
-              >
-                <ShieldCheck className="size-4" />
-              </Link>
-            )}
+              <Languages className="size-4" />
+              <span className="ms-1 uppercase">{lang}</span>
+            </Button>
+
             <NotificationsBell />
-            <Button variant="ghost" size="icon-sm" aria-label="ظاهر برنامه" title="شخصی‌سازی ظاهر" onClick={() => setAppearanceOpen(true)}>
+            <Button variant="ghost" size="icon-sm" aria-label="Appearance" title={lang === "en" ? "Appearance" : "شخصی‌سازی ظاهر"} onClick={() => setAppearanceOpen(true)}>
               <Palette />
             </Button>
 
@@ -280,6 +285,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
                 role={user.role}
                 signingOut={signingOut}
                 isAdmin={isAdmin}
+                lang={lang}
                 onProfile={() => setProfileOpen(true)}
                 onExport={handleExport}
                 onImportPick={handleImportPick}
@@ -299,7 +305,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
               <Input
                 value={search ?? ""}
                 onChange={(e) => onSearch(e.target.value)}
-                placeholder="جستجوی کارت…"
+                placeholder={lang === "en" ? "Search cards..." : "جستجوی کارت…"}
                 className="h-10 bg-surface-2 pe-9 placeholder:text-subtle"
               />
             </div>
@@ -334,7 +340,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
                 {item.label}
                 {item.badge ? (
                   <span className="absolute top-1 start-2 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[9px] font-semibold text-danger-fg">
-                    {item.badge > 9 ? "۹+" : item.badge}
+                    {item.badge > 9 ? "9+" : item.badge}
                   </span>
                 ) : null}
               </Link>
@@ -366,7 +372,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
                 {item.label}
                 {item.badge ? (
                   <span className="absolute top-1 start-1/2 ms-2 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[9px] font-semibold text-danger-fg">
-                    {item.badge > 9 ? "۹+" : item.badge}
+                    {item.badge > 9 ? "9+" : item.badge}
                   </span>
                 ) : null}
               </Link>
@@ -403,10 +409,12 @@ function BoardSwitcher({
   boards,
   boardId,
   onCreate,
+  lang,
 }: {
   boards: BoardSummary[];
   boardId?: string;
   onCreate?: () => void;
+  lang: "fa" | "en";
 }) {
   const current = boards.find((b) => b.id === boardId);
   const navigate = useNavigate();
@@ -418,7 +426,7 @@ function BoardSwitcher({
   const restoreMut = useMutation({
     mutationFn: (id: string) => restoreBoard({ data: { boardId: id } }),
     onSuccess: async (_r, id) => {
-      toast.success("تخته از بایگانی خارج شد");
+      toast.success(lang === "en" ? "Board restored" : "تخته از بایگانی خارج شد");
       await qc.invalidateQueries({ queryKey: ["boards"] });
       await qc.invalidateQueries({ queryKey: ["boards-archived"] });
       void navigate({ to: "/b/$boardId", params: { boardId: id } });
@@ -427,7 +435,7 @@ function BoardSwitcher({
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteBoardPermanently({ data: { boardId: id } }),
     onSuccess: async () => {
-      toast.success("تخته برای همیشه حذف شد");
+      toast.success(lang === "en" ? "Board deleted permanently" : "تخته برای همیشه حذف شد");
       await qc.invalidateQueries({ queryKey: ["boards"] });
       await qc.invalidateQueries({ queryKey: ["boards-archived"] });
     },
@@ -436,13 +444,13 @@ function BoardSwitcher({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" size="sm" className="max-w-[46vw] truncate sm:max-w-xs" title="انتخاب تخته">
+        <Button variant="secondary" size="sm" className="max-w-[46vw] truncate sm:max-w-xs" title={lang === "en" ? "Select board" : "انتخاب تخته"}>
           <LayoutGrid className="size-3.5" />
-          <span className="truncate">{current?.title ?? "تخته‌ها"}</span>
+          <span className="truncate">{current?.title ?? (lang === "en" ? "Boards" : "تخته‌ها")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-72">
-        <DropdownMenuLabel>تخته‌های فعال</DropdownMenuLabel>
+        <DropdownMenuLabel>{lang === "en" ? "Active Boards" : "تخته‌های فعال"}</DropdownMenuLabel>
         {boards.map((b) => (
           <DropdownMenuItem
             key={b.id}
@@ -456,7 +464,7 @@ function BoardSwitcher({
         {onCreate && (
           <DropdownMenuItem onSelect={onCreate}>
             <Plus className="size-4" />
-            تخته جدید
+            {lang === "en" ? "New Board" : "تخته جدید"}
           </DropdownMenuItem>
         )}
         {archived.length > 0 && (
@@ -464,7 +472,7 @@ function BoardSwitcher({
             <DropdownMenuSeparator />
             <DropdownMenuLabel>
               <span className="inline-flex items-center gap-1">
-                <Archive className="size-3.5" /> بایگانی تخته‌ها
+                <Archive className="size-3.5" /> {lang === "en" ? "Archived Boards" : "بایگانی تخته‌ها"}
               </span>
             </DropdownMenuLabel>
             {archived.map((b) => (
@@ -479,7 +487,7 @@ function BoardSwitcher({
                     restoreMut.mutate(b.id);
                   }}
                 >
-                  بازگردانی
+                  {lang === "en" ? "Restore" : "بازگردانی"}
                 </button>
                 <button
                   type="button"
@@ -487,12 +495,12 @@ function BoardSwitcher({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (confirm(`تخته «${b.title}» برای همیشه حذف شود؟ این کار برگشت‌ناپذیر است.`)) {
+                    if (confirm(lang === "en" ? `Delete board "${b.title}" permanently?` : `تخته «${b.title}» برای همیشه حذف شود؟ این کار برگشت‌ناپذیر است.`)) {
                       deleteMut.mutate(b.id);
                     }
                   }}
                 >
-                  حذف
+                  {lang === "en" ? "Delete" : "حذف"}
                 </button>
               </div>
             ))}
@@ -509,6 +517,7 @@ function AccountChip({
   role,
   signingOut,
   isAdmin,
+  lang,
   onProfile,
   onExport,
   onImportPick,
@@ -520,6 +529,7 @@ function AccountChip({
   role: string;
   signingOut: boolean;
   isAdmin: boolean;
+  lang: "fa" | "en";
   onProfile: () => void;
   onExport: () => void;
   onImportPick: () => void;
@@ -532,8 +542,8 @@ function AccountChip({
         <button
           type="button"
           className="flex items-center gap-2 rounded-full p-0.5 pe-2 hover:bg-accent-soft"
-          aria-label="حساب کاربری"
-          title="منوی حساب کاربری"
+          aria-label="Account"
+          title={lang === "en" ? "Account Menu" : "منوی حساب کاربری"}
         >
           <UserAvatar username={username} name={name} size="sm" />
           <span className="hidden max-w-28 truncate text-[13px] sm:inline">{name}</span>
@@ -555,28 +565,28 @@ function AccountChip({
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={onProfile}>
           <UserRound className="size-4" />
-          پروفایل و عکس
+          {lang === "en" ? "Profile & Avatar" : "پروفایل و عکس"}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onChangePassword}>
           <KeyRound className="size-4" />
-          تغییر رمز عبور
+          {lang === "en" ? "Change Password" : "تغییر رمز عبور"}
         </DropdownMenuItem>
         {isAdmin && (
           <>
             <DropdownMenuItem onSelect={onExport}>
               <Download className="size-4" />
-              پشتیبان‌گیری (خروجی فایل)
+              {lang === "en" ? "Backup (Export JSON)" : "پشتیبان‌گیری (خروجی فایل)"}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={onImportPick}>
               <Upload className="size-4" />
-              بازیابی از فایل پشتیبان
+              {lang === "en" ? "Restore from Backup" : "بازیابی از فایل پشتیبان"}
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled={signingOut} onSelect={onSignOut}>
           <LogOut className="size-4" />
-          {signingOut ? "در حال خروج…" : "خروج"}
+          {signingOut ? (lang === "en" ? "Signing out..." : "در حال خروج…") : (lang === "en" ? "Sign Out" : "خروج")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
