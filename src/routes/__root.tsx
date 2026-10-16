@@ -1,6 +1,6 @@
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LocalSessionProvider } from "@/lib/local-session";
@@ -25,7 +25,6 @@ export const Route = createRootRoute({
   component: RootDocument,
 });
 
-/** The server says "not logged in" (session expired / password changed elsewhere) → back to the login page. */
 function handleQueryError(error: unknown) {
   if (typeof window === "undefined") return;
   if (error instanceof Error && error.message.includes("AUTH_REQUIRED") && window.location.pathname !== "/login") {
@@ -44,8 +43,21 @@ function RootDocument() {
       }),
   );
 
+  const [lang, setLang] = useState<"fa" | "en">("fa");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sibamotor-lang") as "fa" | "en";
+      if (saved === "en" || saved === "fa") {
+        setLang(saved);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning data-theme="ink" data-accent="blue" data-font="vazirmatn" data-scheme="dark">
+    <html lang={lang} dir={lang === "fa" ? "rtl" : "ltr"} suppressHydrationWarning data-theme="ink" data-accent="blue" data-font="vazirmatn" data-scheme="dark">
       <head>
         <HeadContent />
       </head>
@@ -54,7 +66,7 @@ function RootDocument() {
           <QueryClientProvider client={queryClient}>
             <ThemeProvider>
               <Outlet />
-              <Toaster position="top-center" dir="rtl" richColors />
+              <Toaster position="top-center" dir={lang === "fa" ? "rtl" : "ltr"} richColors />
             </ThemeProvider>
           </QueryClientProvider>
         </LocalSessionProvider>
