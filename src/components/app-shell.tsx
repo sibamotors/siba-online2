@@ -149,14 +149,9 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
       { to: "/reports-inbox", icon: FileText, label: "گزارش", match: (p: string) => p.startsWith("/reports-inbox") },
       { to: "/my", icon: ListTodo, label: "کارهای من", match: (p: string) => p.startsWith("/my") },
       { to: "/messages", icon: MessageSquare, label: "پیام‌ها", match: (p: string) => p.startsWith("/messages"), badge: unread },
-      { to: "/people", icon: Users, label: "افراد", match: (p: string) => p.startsWith("/people") },
-      { to: "/activity", icon: History, label: "لاگ", match: (p: string) => p.startsWith("/activity") },
     ];
-    if (isAdmin) {
-      items.push({ to: "/admin", icon: ShieldCheck, label: "کاربران", match: (p: string) => p.startsWith("/admin") });
-    }
     return items;
-  }, [boardId, boards, isAdmin, unread]);
+  }, [boardId, boards, unread]);
 
   async function handleExport() {
     try {
@@ -239,6 +234,38 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
           </div>
 
           <div className="ms-auto flex items-center gap-1">
+            <Link
+              to="/people"
+              className={cn(
+                "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
+                pathname.startsWith("/people") && "bg-accent-soft text-fg"
+              )}
+              title="افراد"
+            >
+              <Users className="size-4" />
+            </Link>
+            <Link
+              to="/activity"
+              className={cn(
+                "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
+                pathname.startsWith("/activity") && "bg-accent-soft text-fg"
+              )}
+              title="لاگ رویدادها"
+            >
+              <History className="size-4" />
+            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={cn(
+                  "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
+                  pathname.startsWith("/admin") && "bg-accent-soft text-fg"
+                )}
+                title="مدیریت کاربران"
+              >
+                <ShieldCheck className="size-4" />
+              </Link>
+            )}
             <NotificationsBell />
             <Button variant="ghost" size="icon-sm" aria-label="ظاهر برنامه" title="شخصی‌سازی ظاهر" onClick={() => setAppearanceOpen(true)}>
               <Palette />
@@ -532,7 +559,7 @@ function AccountChip({
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onChangePassword}>
           <KeyRound className="size-4" />
-          تییر رمز عبور
+          تغییر رمز عبور
         </DropdownMenuItem>
         {isAdmin && (
           <>
