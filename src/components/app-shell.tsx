@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   Target,
   Upload,
+  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -148,6 +149,7 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
       { to: "/reports-inbox", icon: FileText, label: "گزارش", match: (p: string) => p.startsWith("/reports-inbox") },
       { to: "/my", icon: ListTodo, label: "کارهای من", match: (p: string) => p.startsWith("/my") },
       { to: "/messages", icon: MessageSquare, label: "پیام‌ها", match: (p: string) => p.startsWith("/messages"), badge: unread },
+      { to: "/people", icon: Users, label: "افراد", match: (p: string) => p.startsWith("/people") },
       { to: "/activity", icon: History, label: "لاگ", match: (p: string) => p.startsWith("/activity") },
     ];
     if (isAdmin) {
@@ -530,7 +532,7 @@ function AccountChip({
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onChangePassword}>
           <KeyRound className="size-4" />
-          تغییر رمز عبور
+          تییر رمز عبور
         </DropdownMenuItem>
         {isAdmin && (
           <>
