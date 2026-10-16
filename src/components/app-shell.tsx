@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   Target,
   Upload,
+  Users,
   Languages,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -259,19 +260,52 @@ export function AppShell({ boards, boardId, search, onSearch, onCreateBoard, chi
           </div>
 
           <div className="ms-auto flex items-center gap-1">
+            <Link
+              to="/people"
+              className={cn(
+                "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
+                pathname.startsWith("/people") && "bg-accent-soft text-fg"
+              )}
+              title={lang === "en" ? "People" : "افراد"}
+            >
+              <Users className="size-4" />
+            </Link>
+            <Link
+              to="/activity"
+              className={cn(
+                "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
+                pathname.startsWith("/activity") && "bg-accent-soft text-fg"
+              )}
+              title={lang === "en" ? "Activity Log" : "لاگ رویدادها"}
+            >
+              <History className="size-4" />
+            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={cn(
+                  "inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-accent-soft hover:text-fg",
+                  pathname.startsWith("/admin") && "bg-accent-soft text-fg"
+                )}
+                title={lang === "en" ? "Users Management" : "مدیریت کاربران"}
+              >
+                <ShieldCheck className="size-4" />
+              </Link>
+            )}
+            <NotificationsBell />
+            
             {/* Language Switch Button */}
             <Button
               variant="ghost"
               size="icon-sm"
               onClick={toggleLanguage}
               title={lang === "fa" ? "Change to English" : "تغییر به فارسی"}
-              className="font-semibold text-xs px-2"
+              className="gap-1 px-2 font-semibold"
             >
               <Languages className="size-4" />
-              <span className="ms-1 uppercase">{lang}</span>
+              <span className="text-[11px] uppercase">{lang}</span>
             </Button>
 
-            <NotificationsBell />
             <Button variant="ghost" size="icon-sm" aria-label="Appearance" title={lang === "en" ? "Appearance" : "شخصی‌سازی ظاهر"} onClick={() => setAppearanceOpen(true)}>
               <Palette />
             </Button>
