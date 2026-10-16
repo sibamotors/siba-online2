@@ -152,7 +152,7 @@ export function NotificationsBell() {
       }}
     >
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label="اعلان‌ها" className="relative">
+        <Button variant="ghost" size="icon-sm" aria-label="اعلان‌ها" title="اعلان‌ها" className="relative">
           <Bell className="size-4" />
           {unread > 0 && (
             <span className="absolute -top-0.5 -start-0.5 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-danger-fg">
