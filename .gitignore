@@ -1,0 +1,23 @@
+# dependencies & build output
+node_modules/
+.output/
+dist/
+.vite/
+.tanstack/
+.nitro/
+
+# local database (development only) and logs
+.pglite-data/
+*.log
+
+# secrets — NEVER commit these
+.env
+.env.*
+!.env.example
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/
+# PM2 logs (the directory placeholder is tracked)
+logs/*.log
