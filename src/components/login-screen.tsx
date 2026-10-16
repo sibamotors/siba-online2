@@ -1,4 +1,3 @@
-cat << 'EOF' > src/components/login-screen.tsx
 import {
   Activity,
   ArrowLeft,
@@ -19,6 +18,7 @@ import {
   Sparkles,
   Target,
   User,
+  Languages,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
@@ -30,165 +30,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-
-const FEATURES = [
-  {
-    icon: LayoutGrid,
-    title: "بورد هوشمند کانبان",
-    desc: "مدیریت جریان کار، محدودیت WIP، چک‌لیست و وابستگی تسک‌ها",
-  },
-  {
-    icon: Target,
-    title: "موتور چابک اسکرام (Scrum)",
-    desc: "برنامه‌ریزی اسپرینت، مدیریت بک‌لاگ، تخمین امتیاز و نمودار برن‌داون",
-  },
-  {
-    icon: CalendarDays,
-    title: "تقویم شمسی و نمودار گانت",
-    desc: "زمان‌بندی دقیق، مسیر بحرانی پروژه و رصد ددلاین‌ها به تاریخ جلالی",
-  },
-  {
-    icon: FileText,
-    title: "گزارش‌کار و تحلیل عملکرد",
-    desc: "ثبت کارکرد روزانه، چارت‌های تحلیلی پیشرفته و چرخه تأیید مدیران",
-  },
-  {
-    icon: MessageSquare,
-    title: "گفتگوی سازمانی یکپارچه",
-    desc: "کانال‌های موضوعی، پیام مستقیم، اشتراک فایل و ارجاع سریع به کارت‌ها",
-  },
-  {
-    icon: History,
-    title: "ردیابی و ممیزی کامل (Audit)",
-    desc: "ثبت لحظه‌به‌لحظه تمام رویدادها و تغییرات با جزئیات کامل کاربر و زمان",
-  },
-];
-
-const TRUST = [
-  { icon: ShieldCheck, label: "نشست رمزنگاری‌شده و امن" },
-  { icon: KeyRound, label: "تأیید هویت دومرحله‌ای (PIN)" },
-  { icon: Activity, label: "پایش و ثبت کامل رخدادها" },
-];
-
-function ProductPreview() {
-  const cols = [
-    {
-      t: "بک‌لاگ اسپرینت",
-      count: "۴",
-      cards: [
-        { w: "w-4/5", tone: "bg-danger", pts: "5 SP", tag: "فوری" },
-        { w: "w-3/5", tone: "bg-warning", pts: "3 SP", tag: "رابط کاربری" },
-      ],
-    },
-    {
-      t: "در حال توسعه",
-      count: "۳ / ۴",
-      cards: [
-        { w: "w-full", tone: "bg-accent", pts: "8 SP", tag: "معماری" },
-        { w: "w-2/3", tone: "bg-sky-400", pts: "2 SP", tag: "API" },
-      ],
-    },
-    {
-      t: "تکمیل‌شده",
-      count: "۱۲",
-      cards: [
-        { w: "w-3/4", tone: "bg-success", pts: "5 SP", tag: "تست‌شده" },
-        { w: "w-4/5", tone: "bg-success", pts: "3 SP", tag: "انتشار" },
-      ],
-    },
-  ] as const;
-
-  return (
-    <div
-      className="login-float relative mx-auto w-full max-w-lg rounded-2xl border border-border/80 bg-bg-elevated/70 p-4 shadow-[0_32px_90px_-28px_rgba(0,0,0,0.65)] backdrop-blur-xl"
-      aria-hidden
-    >
-      <div className="mb-3 flex items-center justify-between gap-2 px-1">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-danger/80" />
-            <span className="size-2.5 rounded-full bg-warning/80" />
-            <span className="size-2.5 rounded-full bg-success/80" />
-          </div>
-          <span className="ms-1 text-[11px] font-medium text-muted">
-            فضای کاری چابک
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-            <Flame className="size-3" />
-            سرعت تیم: ۳۸ امتیاز
-          </span>
-          <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-[10px] font-semibold text-accent">
-            ⚡ اسپرینت ۱۴ · ۵ روز مانده
-          </span>
-        </div>
-      </div>
-
-      <div className="mb-3 rounded-xl border border-border/50 bg-surface-2/60 p-2.5">
-        <div className="mb-1.5 flex items-center justify-between text-[11px]">
-          <span className="font-medium text-fg/90">پیشرفت تحقق اهداف اسپرینت</span>
-          <span className="font-semibold text-accent">۷۴٪ تکمیل</span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-surface">
-          <div className="h-full w-[74%] rounded-full bg-gradient-to-l from-accent to-sky-400" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2.5">
-        {cols.map((c) => (
-          <div
-            key={c.t}
-            className="rounded-xl border border-border/50 bg-surface-2/75 p-2.5"
-          >
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] font-semibold text-fg/80">{c.t}</p>
-              <span className="rounded bg-surface px-1.5 py-0.5 text-[9px] font-medium text-muted">
-                {c.count}
-              </span>
-            </div>
-            <div className="space-y-2">
-              {c.cards.map((card, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg border border-border/60 bg-surface p-2 shadow-xs"
-                >
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <span className={cn("h-1.5 w-8 rounded-full", card.tone)} />
-                    <span className="rounded bg-surface-2 px-1 py-0.2 text-[8px] font-mono text-muted">
-                      {card.pts}
-                    </span>
-                  </div>
-                  <div className={cn("h-1.5 rounded-full bg-fg/25", card.w)} />
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-[8px] text-muted">{card.tag}</span>
-                    <span className="size-3.5 rounded-full bg-accent/25 ring-1 ring-accent/40" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2.5 px-1 text-[10px] text-muted">
-        <span className="inline-flex items-center gap-1 text-emerald-400">
-          <CheckCircle2 className="size-3" />
-          نمودار برن‌داون: منطبق بر خط ایده‌آل
-        </span>
-        <span className="flex -space-x-1.5 rtl:space-x-reverse">
-          {["#3b82f6", "#10b981", "#f59e0b", "#a855f7"].map((c) => (
-            <span
-              key={c}
-              className="size-4 rounded-full ring-2 ring-[var(--k-surface)]"
-              style={{ background: c }}
-            />
-          ))}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export function LoginScreen() {
   const { login, completePinLogin } = useLocalSession();
@@ -204,14 +45,70 @@ export function LoginScreen() {
   const [capsOn, setCapsOn] = useState(false);
   const [remember, setRemember] = useState(true);
 
+  // Language state for login
+  const [lang, setLang] = useState<"fa" | "en">("fa");
+
   useEffect(() => {
     try {
+      const saved = localStorage.getItem("sibamotor-lang") as "fa" | "en";
+      if (saved === "en" || saved === "fa") setLang(saved);
       const last = localStorage.getItem("sibamotor-last-user");
       if (last) setUsername(last);
     } catch {
       /* storage unavailable */
     }
   }, []);
+
+  function toggleLanguage() {
+    const next = lang === "fa" ? "en" : "fa";
+    setLang(next);
+    try {
+      localStorage.setItem("sibamotor-lang", next);
+    } catch {
+      // ignore
+    }
+  }
+
+  const isEn = lang === "en";
+
+  const FEATURES = [
+    {
+      icon: LayoutGrid,
+      title: isEn ? "Smart Kanban Board" : "بورد هوشمند کانبان",
+      desc: isEn ? "Workflow management, WIP limits, checklists & dependencies" : "مدیریت جریان کار، محدودیت WIP، چک‌لیست و وابستگی تسک‌ها",
+    },
+    {
+      icon: Target,
+      title: isEn ? "Agile Scrum Engine" : "موتور چابک اسکرام (Scrum)",
+      desc: isEn ? "Sprint planning, backlog management, story points & burndown" : "برنامه‌ریزی اسپرینت، مدیریت بک‌لاگ، تخمین امتیاز و نمودار برن‌داون",
+    },
+    {
+      icon: CalendarDays,
+      title: isEn ? "Calendar & Gantt Chart" : "تقویم شمسی و نمودار گانت",
+      desc: isEn ? "Precise scheduling, critical path & deadline tracking" : "زمان‌بندی دقیق، مسیر بحرانی پروژه و رصد ددلاین‌ها به تاریخ جلالی",
+    },
+    {
+      icon: FileText,
+      title: isEn ? "Reports & Performance" : "گزارش‌کار و تحلیل عملکرد",
+      desc: isEn ? "Daily logs, advanced analytics & managerial approval cycle" : "ثبت کارکرد روزانه، چارت‌های تحلیلی پیشرفته و چرخه تأیید مدیران",
+    },
+    {
+      icon: MessageSquare,
+      title: isEn ? "Unified Enterprise Chat" : "گفتگوی سازمانی یکپارچه",
+      desc: isEn ? "Topic channels, direct messages, file sharing & card referencing" : "کانال‌های موضوعی، پیام مستقیم، اشتراک فایل و ارجاع سریع به کارت‌ها",
+    },
+    {
+      icon: History,
+      title: isEn ? "Full Audit & Tracking" : "ردیابی و ممیزی کامل (Audit)",
+      desc: isEn ? "Real-time event logging with user & timestamp details" : "ثبت لحظه‌به‌لحظه تمام رویدادها و تغییرات با جزئیات کامل کاربر و زمان",
+    },
+  ];
+
+  const TRUST = [
+    { icon: ShieldCheck, label: isEn ? "Encrypted & Secure Session" : "نشست رمزنگاری‌شده و امن" },
+    { icon: KeyRound, label: isEn ? "Two-Factor Auth (PIN)" : "تأیید هویت دومرحله‌ای (PIN)" },
+    { icon: Activity, label: isEn ? "Full Audit Logging" : "پایش و ثبت کامل رخدادها" },
+  ];
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -251,7 +148,7 @@ export function LoginScreen() {
   }
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-[var(--k-bg,#0b0d12)] text-fg">
+    <div className="relative min-h-dvh overflow-hidden bg-[var(--k-bg,#0b0d12)] text-fg" dir={isEn ? "ltr" : "rtl"}>
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="k-wallpaper absolute inset-0 opacity-80" />
         <div
@@ -314,15 +211,30 @@ export function LoginScreen() {
         .login-rise-delay-3 { animation-delay: 0.24s; }
       `}</style>
 
-      <button
-        type="button"
-        onClick={() => setAppearanceOpen(true)}
-        className="absolute end-4 top-4 z-20 inline-flex h-10 items-center gap-2 rounded-full border border-border/80 bg-bg-elevated/70 px-3.5 text-[13px] font-medium text-muted backdrop-blur-md transition hover:border-border-strong hover:text-fg"
-        aria-label="تنظیمات ظاهر برنامه"
-      >
-        <Palette className="size-4 text-accent" />
-        <span className="hidden sm:inline">شخصی‌سازی ظاهر</span>
-      </button>
+      {/* Top action buttons */}
+      <div className="absolute end-4 top-4 z-20 flex items-center gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={toggleLanguage}
+          className="h-10 rounded-full border border-border/80 bg-bg-elevated/70 px-3.5 text-[13px] font-medium text-muted backdrop-blur-md transition hover:border-border-strong hover:text-fg"
+          title={isEn ? "تغییر به فارسی" : "Change to English"}
+        >
+          <Languages className="size-4 text-accent" />
+          <span className="uppercase">{lang}</span>
+        </Button>
+        <button
+          type="button"
+          onClick={() => setAppearanceOpen(true)}
+          className="inline-flex h-10 items-center gap-2 rounded-full border border-border/80 bg-bg-elevated/70 px-3.5 text-[13px] font-medium text-muted backdrop-blur-md transition hover:border-border-strong hover:text-fg"
+          aria-label="Appearance"
+          title={isEn ? "Appearance" : "شخصی‌سازی ظاهر"}
+        >
+          <Palette className="size-4 text-accent" />
+          <span className="hidden sm:inline">{isEn ? "Appearance" : "شخصی‌سازی ظاهر"}</span>
+        </button>
+      </div>
 
       <div className="relative z-10 mx-auto grid min-h-dvh max-w-6xl items-center gap-12 px-4 py-10 lg:grid-cols-12 lg:gap-12">
         <section className="hidden lg:col-span-7 lg:block">
@@ -333,7 +245,7 @@ export function LoginScreen() {
                 <p className="text-xl font-bold tracking-tight">{APP_NAME}</p>
                 <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent-soft px-2 py-0.5 text-[10px] font-semibold text-accent">
                   <Sparkles className="size-3" />
-                  نسخه سازمانی چابک
+                  {isEn ? "Agile Enterprise Edition" : "نسخه سازمانی چابک"}
                 </span>
               </div>
               <p className="mt-0.5 text-[12px] text-muted">{APP_TAGLINE}</p>
@@ -341,19 +253,17 @@ export function LoginScreen() {
           </div>
 
           <h1 className="login-rise login-rise-delay-1 mt-7 text-3xl font-bold leading-[1.3] tracking-tight xl:text-[40px]">
-            برنامه‌ریزی، پیگیری و مدیریت
+            {isEn ? "Advanced Project Planning," : "برنامه‌ریزی، پیگیری و مدیریت"}
             <br />
             <span className="bg-gradient-to-l from-accent via-sky-400 to-indigo-400 bg-clip-text text-transparent">
-              پیشرفته پروژه در تراز جهانی
+              {isEn ? "Tracking & Management" : "پیشرفته پروژه در تراز جهانی"}
             </span>
           </h1>
           <p className="login-rise login-rise-delay-1 mt-3.5 max-w-xl text-[14px] leading-7 text-muted">
-            تمامی ابزارهای مورد نیاز تیم‌های مدرن از برنامه‌ریزی اسپرینت (Scrum)، بوردهای پیشرفته کانبان و تایم‌لاین گانت تا گزارش‌کار روزانه و پیام‌رسان سازمانی در یک زیست‌بوم یکپارچه.
+            {isEn
+              ? "All essential tools for modern teams from Scrum planning, advanced Kanban boards, and Gantt timelines to daily reports and enterprise chat in one unified ecosystem."
+              : "تمامی ابزارهای مورد نیاز تیم‌های مدرن از برنامه‌ریزی اسپرینت (Scrum)، بوردهای پیشرفته کانبان و تایم‌لاین گانت تا گزارش‌کار روزانه و پیام‌رسان سازمانی در یک زیست‌بوم یکپارچه."}
           </p>
-
-          <div className="login-rise login-rise-delay-2 mt-7">
-            <ProductPreview />
-          </div>
 
           <ul className="login-rise login-rise-delay-3 mt-7 grid grid-cols-2 gap-2.5 xl:grid-cols-3">
             {FEATURES.map((h) => (
@@ -387,19 +297,21 @@ export function LoginScreen() {
 
             <div className="mb-6">
               <h2 className="text-xl font-bold tracking-tight">
-                {pinTicket ? "تأیید هویت دومرحله‌ای" : "ورود به فضای کاری"}
+                {pinTicket
+                  ? (isEn ? "Two-Factor Authentication" : "تأیید هویت دومرحله‌ای")
+                  : (isEn ? "Sign In to Workspace" : "ورود به فضای کاری")}
               </h2>
               <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
                 {pinTicket
-                  ? "کد پین امنیتی ۶ یا ۴ رقمی حساب کاربری خود را وارد نمایید."
-                  : "برای دسترسی به بوردها و میز کار خود، اطلاعات کاربری را وارد کنید."}
+                  ? (isEn ? "Enter your 4 to 8-digit security PIN." : "کد پین امنیتی ۶ یا ۴ رقمی حساب کاربری خود را وارد نمایید.")
+                  : (isEn ? "Enter your credentials to access your boards." : "برای دسترسی به بوردها و میز کار خود، اطلاعات کاربری را وارد کنید.")}
               </p>
             </div>
 
             <form className="space-y-4" onSubmit={onSubmit}>
               <div>
                 <Label htmlFor="username" className="text-[12.5px] font-medium">
-                  نام کاربری
+                  {isEn ? "Username" : "نام کاربری"}
                 </Label>
                 <div className="relative mt-1.5" dir="ltr">
                   <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-subtle" />
@@ -420,7 +332,7 @@ export function LoginScreen() {
               <div>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-[12.5px] font-medium">
-                    رمز عبور
+                    {isEn ? "Password" : "رمز عبور"}
                   </Label>
                 </div>
                 <div className="relative mt-1.5" dir="ltr">
@@ -444,7 +356,7 @@ export function LoginScreen() {
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-subtle transition hover:bg-surface-2 hover:text-fg"
                     onClick={() => setShowPass((v) => !v)}
                     tabIndex={-1}
-                    aria-label={showPass ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"}
+                    aria-label={showPass ? "Hide password" : "Show password"}
                   >
                     {showPass ? (
                       <EyeOff className="size-4" />
@@ -457,7 +369,7 @@ export function LoginScreen() {
 
               {capsOn && !pinTicket && (
                 <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-1.5 text-[12px] text-warning">
-                  <span>⚠️ کلید Caps Lock روشن است؛ به بزرگی و کوچکی حروف دقت کنید.</span>
+                  <span>{isEn ? "⚠️ Caps Lock is on." : "⚠️ کلید Caps Lock روشن است؛ به بزرگی و کوچکی حروف دقت کنید."}</span>
                 </div>
               )}
 
@@ -470,7 +382,7 @@ export function LoginScreen() {
                       onChange={(e) => setRemember(e.target.checked)}
                       className="size-4 rounded accent-[var(--k-accent)]"
                     />
-                    خاطر داشتن نام کاربری در این دستگاه
+                    {isEn ? "Remember username on this device" : "خاطر داشتن نام کاربری در این دستگاه"}
                   </label>
                 </div>
               )}
@@ -479,9 +391,9 @@ export function LoginScreen() {
                 <div className="rounded-xl border border-accent/35 bg-accent-soft/40 p-3.5">
                   <div className="mb-2 flex items-center gap-2 text-[12px] font-medium text-accent">
                     <Shield className="size-4" />
-                    حفاظت دومرحله‌ای فعال است
+                    {isEn ? "Two-factor protection is active" : "حفاظت دومرحله‌ای فعال است"}
                   </div>
-                  <Label htmlFor="pin">پین امنیتی (۴ تا ۸ رقم)</Label>
+                  <Label htmlFor="pin">{isEn ? "Security PIN (4-8 digits)" : "پین امنیتی (۴ تا ۸ رقم)"}</Label>
                   <Input
                     id="pin"
                     type="password"
@@ -514,10 +426,10 @@ export function LoginScreen() {
               >
                 <span>
                   {busy
-                    ? "در حال احراز هویت و اتصال…"
+                    ? (isEn ? "Authenticating..." : "در حال احراز هویت و اتصال…")
                     : pinTicket
-                      ? "تأیید پین و ورود به میز کار"
-                      : "ورود به فضای کاری"}
+                      ? (isEn ? "Verify PIN & Enter" : "تأیید پین و ورود به میز کار")
+                      : (isEn ? "Sign In to Workspace" : "ورود به فضای کاری")}
                 </span>
                 {!busy && <ArrowLeft className="size-4" />}
               </Button>
@@ -532,7 +444,7 @@ export function LoginScreen() {
                     setError(null);
                   }}
                 >
-                  بازگشت به مرحله نام کاربری
+                  {isEn ? "Back to username step" : "بازگشت به مرحله نام کاربری"}
                 </button>
               )}
             </form>
@@ -550,12 +462,12 @@ export function LoginScreen() {
             </ul>
 
             <p className="mt-4 text-center text-[11.5px] font-medium leading-relaxed text-subtle">
-              طراحی و توسعه · شهریور ۱۴۰۵ · Abbasi & Mojarrad
+              Designed & Developed · Sep 2026 · Abbasi & Mojarrad
             </p>
           </div>
 
           <p className="mt-4 text-center text-[11.5px] text-subtle/85">
-            در صورت فراموشی رمز عبور یا نیاز به حساب جدید، با مدیر سامانه هماهنگ کنید.
+            {isEn ? "If you forgot your password, please contact your system administrator." : "در صورت فراموشی رمز عبور یا نیاز به حساب جدید، با مدیر سامانه هماهنگ کنید."}
           </p>
         </section>
       </div>
@@ -564,4 +476,3 @@ export function LoginScreen() {
     </div>
   );
 }
-EOF
