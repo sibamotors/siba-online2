@@ -1,9 +1,10 @@
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LocalSessionProvider } from "@/lib/local-session";
+import { LanguageProvider } from "@/lib/i18n";
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import appCss from "../styles.css?url";
 
@@ -43,33 +44,22 @@ function RootDocument() {
       }),
   );
 
-  const [lang, setLang] = useState<"fa" | "en">("fa");
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("sibamotor-lang") as "fa" | "en";
-      if (saved === "en" || saved === "fa") {
-        setLang(saved);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
-
   return (
-    <html lang={lang} dir={lang === "fa" ? "rtl" : "ltr"} suppressHydrationWarning data-theme="ink" data-accent="blue" data-font="vazirmatn" data-scheme="dark">
+    <html lang="fa" dir="rtl" suppressHydrationWarning data-theme="ink" data-accent="blue" data-font="vazirmatn" data-scheme="dark">
       <head>
         <HeadContent />
       </head>
       <body className="antialiased">
-        <LocalSessionProvider>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-              <Outlet />
-              <Toaster position="top-center" dir={lang === "fa" ? "rtl" : "ltr"} richColors />
-            </ThemeProvider>
-          </QueryClientProvider>
-        </LocalSessionProvider>
+        <LanguageProvider>
+          <LocalSessionProvider>
+            <QueryClientProvider client={queryClient}>
+              <ThemeProvider>
+                <Outlet />
+                <Toaster position="top-center" richColors />
+              </ThemeProvider>
+            </QueryClientProvider>
+          </LocalSessionProvider>
+        </LanguageProvider>
         <Scripts />
       </body>
     </html>
